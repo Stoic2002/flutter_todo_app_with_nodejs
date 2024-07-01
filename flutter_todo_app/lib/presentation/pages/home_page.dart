@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_todo_app/domain/entities/todo.dart';
 import 'package:flutter_todo_app/presentation/pages/add_edit_todo_page.dart';
 import 'package:flutter_todo_app/presentation/widgets/todo_list_item.dart';
 import '../bloc/todo_bloc.dart';
@@ -36,6 +37,20 @@ class HomePage extends StatelessWidget {
                   },
                   onDelete: () {
                     context.read<TodoBloc>().add(DeleteTodoEvent(todo.id!));
+                  },
+                  onComplete: (bool? value) {
+                    if (value != null) {
+                      final updatedTodo = Todo(
+                        id: todo.id,
+                        title: todo.title,
+                        description: todo.description,
+                        dueDate: todo.dueDate,
+                        isCompleted: value,
+                      );
+                      context
+                          .read<TodoBloc>()
+                          .add(UpdateTodoEvent(updatedTodo));
+                    }
                   },
                 );
               },

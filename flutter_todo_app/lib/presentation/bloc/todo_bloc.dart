@@ -53,11 +53,27 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     );
   }
 
+  // lib/presentation/bloc/todo_bloc.dart
+
   void _onUpdateTodo(UpdateTodoEvent event, Emitter<TodoState> emit) async {
-    final failureOrTodo = await updateTodo(event.todo);
-    failureOrTodo.fold(
-      (failure) => emit(TodoError('Failed to update todo')),
-      (_) => add(GetTodosEvent()),
+    final updatedTodo = TodoModel(
+      id: event.todo.id,
+      title: event.todo.title,
+      description: event.todo.description,
+      dueDate: event.todo.dueDate,
+      isCompleted: event.todo.isCompleted,
+    );
+
+    final result = await updateTodo(updatedTodo);
+    result.fold(
+      (failure) {
+        print('Failed to update todo: $failure');
+        emit(TodoError('Failed to update todo'));
+      },
+      (todo) {
+        print('Todo updated successfully: ${todo.id}');
+        add(GetTodosEvent());
+      },
     );
   }
 

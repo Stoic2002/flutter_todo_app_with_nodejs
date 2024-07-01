@@ -12,7 +12,7 @@ abstract class TodoRemoteDataSource {
 class TodoRemoteDataSourceImpl implements TodoRemoteDataSource {
   final http.Client client;
   final String baseUrl =
-      'your-api-key'; // Use your actual IP if not using Android emulator
+      'http://10.0.2.2:3000/api'; // Use your actual IP if not using Android emulator
 
   TodoRemoteDataSourceImpl({required this.client});
 
@@ -42,17 +42,26 @@ class TodoRemoteDataSourceImpl implements TodoRemoteDataSource {
     }
   }
 
+  // lib/data/datasources/todo_remote_datasource.dart
+
   @override
   Future<TodoModel> updateTodo(TodoModel todo) async {
-    final response = await client.put(
-      Uri.parse('$baseUrl/todos/${todo.id}'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode(todo.toJson()),
-    );
-    if (response.statusCode == 200) {
-      return TodoModel.fromJson(json.decode(response.body));
-    } else {
-      throw Exception('Failed to update todo');
+    try {
+      print('Updating todo: ${todo.toJson()}');
+      final response = await client.put(
+        Uri.parse('$baseUrl/todos/${todo.id}'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(todo.toJson()),
+      );
+      print('Update response: ${response.statusCode}, ${response.body}');
+      if (response.statusCode == 200) {
+        return TodoModel.fromJson(json.decode(response.body));
+      } else {
+        throw Exception('Failed to update todo: ${response.body}');
+      }
+    } catch (e) {
+      print('Error updating todo: $e');
+      throw Exception('Failed to update todo: $e');
     }
   }
 
